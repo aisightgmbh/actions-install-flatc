@@ -1,0 +1,10 @@
+name: Tests
+on: [push]
+
+jobs:
+  test-action:
+    runs-on: custom-organization-runner
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aisightgmbh/actions-install-flatc@main
+      - run: flatc --version

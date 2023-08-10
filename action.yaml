@@ -1,0 +1,30 @@
+name: Install Flatbuffers Compiler
+description: "Install Flatbuffers schema compiler"
+runs:
+  using: "composite"
+  steps:
+    - name: Add cmake repository with latest versions
+      run: |
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+        echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+        sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
+      shell: bash
+
+    - name: Install cmake
+      run: sudo apt update && sudo apt -y install cmake
+      shell: bash
+
+    - name: Checkout flatc
+      uses: actions/checkout@v3
+      with:
+        repository: google/flatbuffers
+        path: flatbuffers
+
+    - name: Build Flatbuffers compiler
+      run: |
+        cd flatbuffers
+        mkdir build/
+        cmake -Bbuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+        sudo cmake --build build/ --target install --parallel $(nproc)
+        sudo rm -rf ./build
+      shell: bash
